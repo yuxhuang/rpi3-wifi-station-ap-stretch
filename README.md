@@ -31,32 +31,13 @@ guests.  When the party's over, change the access point password.
     ACTION=="add", SUBSYSTEM=="ieee80211", KERNEL=="phy0", \
         RUN+="/sbin/iw phy %k interface add uap0 type __ap"
 
-## /lib/dhcpcd/dhcpcd-hooks/10-wpa_supplicant
+## /etc/dhcpcd.conf
 
-```sh
-if [ -z "$wpa_supplicant_conf" ]; then
-	for x in \
-		/etc/wpa_supplicant/wpa_supplicant-"$interface".conf \
-		/etc/wpa_supplicant/wpa_supplicant.conf \
-		/etc/wpa_supplicant-"$interface".conf \
-		/etc/wpa_supplicant.conf \
-	; do
-		if [ -s "$x" ]; then
-			wpa_supplicant_conf="$x"
-			break
-		fi
-	done
-fi
-: ${wpa_supplicant_conf:=/etc/wpa_supplicant.conf}
+Disable `wpa_supplicant` for `uap0`.
 
-if [ "$ifwireless" = "1" ] && \
-    type wpa_supplicant >/dev/null 2>&1 && \
-    type wpa_cli >/dev/null 2>&1
-then
-	if [ "$reason" = "IPV4LL" ]; then
-		wpa_supplicant -B -iwlan0 -f/var/log/wpa_supplicant.log -c/etc/wpa_supplicant/wpa_supplicant.conf
-	fi
-fi
+```
+interface uap0
+    nohook wpa_supplicant
 ```
 
 ## Set up the client wifi (station) on wlan0.
